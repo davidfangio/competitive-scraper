@@ -2,6 +2,10 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
+from app.models import Product
+from app.database import salvar_produto, salvar_historico
+
+
 def coletar_produtos():
     driver = webdriver.Chrome()
 
@@ -17,8 +21,15 @@ def coletar_produtos():
 
     for produto in produtos:
         nome = produto.find("h3").find("a")["title"]
-        preco = float(produto.find("p", class_="price_color").get_text().replace("£", ""))
-        url = urljoin("https://books.toscrape.com/", produto.find("h3").find("a")["href"])
+        preco = float(
+            produto.find("p", class_="price_color")
+            .get_text()
+            .replace("£", "")
+        )
+        url = urljoin(
+            "https://books.toscrape.com/",
+            produto.find("h3").find("a")["href"]
+        )
 
         dados = {
             "nome": nome,
@@ -26,10 +37,18 @@ def coletar_produtos():
             "url": url
         }
 
+        produto_db = Product(
+            name=dados["nome"],
+            url=dados["url"]
+        )
+
+        produto_id = salvar_produto(produto_db)
+        salvar_historico(produto_id, dados["preco"])
         produtos_extraidos.append(dados)
 
     driver.quit()
-    
+
     return produtos_extraidos
+
 
 produtos_extraidos = coletar_produtos()
