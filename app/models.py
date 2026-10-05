@@ -11,7 +11,7 @@ class Product(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String)
-    url: Mapped[str] = mapped_column(String)
+    url: Mapped[str] = mapped_column(String, unique=True)
 
 
 class PriceHistory(Base):

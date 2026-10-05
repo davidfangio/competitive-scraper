@@ -12,7 +12,20 @@ def get_session():
     return SessionLocal()
 
 def salvar_produto(produto):
+    from app.models import Product
+
     session = get_session()
+
+    produto_existente = (
+        session.query(Product)
+        .filter_by(url=produto.url)
+        .first()
+    )
+
+    if produto_existente:
+        produto_id = produto_existente.id
+        session.close()
+        return produto_id
 
     session.add(produto)
     session.commit()
@@ -47,4 +60,35 @@ import app.models
 
 Base.metadata.create_all(engine)
 
+def buscar_ultimo_preco(produto_id):
+    from app.models import PriceHistory
 
+    session = get_session()
+
+    historico = (
+        session.query(PriceHistory)
+        .filter_by(product_id=produto_id)
+        .order_by(PriceHistory.collected_at.desc())
+        .first()
+    )
+
+    session.close()
+
+    return historico
+
+def buscar_preco_anterior(produto_id):
+    from app.models import PriceHistory
+
+    session = get_session()
+
+    historicos = (
+        session.query(PriceHistory)
+        .filter_by(product_id=produto_id)
+        .order_by(PriceHistory.collected_at.desc())
+        .offset(1)
+        .first()
+    )
+
+    session.close()
+
+    return historicos

@@ -1,9 +1,10 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+from app.monitor import analisar_preco
 
 from app.models import Product
-from app.database import salvar_produto, salvar_historico
+from app.database import salvar_produto, salvar_historico, buscar_ultimo_preco, buscar_preco_anterior
 
 
 def coletar_produtos():
@@ -43,7 +44,17 @@ def coletar_produtos():
         )
 
         produto_id = salvar_produto(produto_db)
+        preco_anterior = buscar_ultimo_preco(produto_id)
+
+        if preco_anterior:
+            resultado = analisar_preco(
+                float(preco_anterior.price),
+                dados["preco"]
+            )
+            print(resultado)
+
         salvar_historico(produto_id, dados["preco"])
+
         produtos_extraidos.append(dados)
 
     driver.quit()
