@@ -2,6 +2,7 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from app.monitor import analisar_preco
+from app.alerts import processar_alerta
 
 from app.models import Product
 from app.database import salvar_produto, salvar_historico, buscar_ultimo_preco, buscar_preco_anterior
@@ -51,7 +52,11 @@ def coletar_produtos():
                 float(preco_anterior.price),
                 dados["preco"]
             )
-            print(resultado)
+
+            alerta = processar_alerta(resultado, dados["nome"])
+
+            if alerta:
+                print(alerta)
 
         salvar_historico(produto_id, dados["preco"])
 
