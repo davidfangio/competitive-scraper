@@ -1,3 +1,5 @@
+from app.email_sender import enviar_email
+
 def deve_alertar(variacao):
     if variacao <= -10:
         return True
@@ -15,6 +17,14 @@ def gerar_alerta(resultado, produto):
 
 def processar_alerta(resultado, produto):
     if deve_alertar(resultado["variacao"]):
-        return gerar_alerta(resultado, produto)
+        alerta = gerar_alerta(resultado, produto)
+
+        enviar_email(
+            "🚨 Alerta de preço",
+            alerta,
+            "dawaceo@gmail.com"
+        )
+
+        return alerta
 
     return None

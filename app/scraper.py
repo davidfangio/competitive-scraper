@@ -67,4 +67,5 @@ def coletar_produtos():
     return produtos_extraidos
 
 
-produtos_extraidos = coletar_produtos()
+if __name__ == "__main__":
+    produtos_extraidos = coletar_produtos()
